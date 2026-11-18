@@ -1,0 +1,155 @@
+services:
+
+  broker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: broker
+    volumes:
+      - ./broker/broker.py:/app/main.py
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: proxy
+    volumes:
+      - ./proxy/proxy.py:/app/main.py
+
+  # servidores
+
+  servidor-py-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: servidor-py-1
+    environment:
+      - NOME=servidor-py-1
+    volumes:
+      - ./python/servidor.py:/app/main.py
+      - ./dados:/app/dados
+    depends_on:
+      - broker
+      - proxy
+
+  servidor-py-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: servidor-py-2
+    environment:
+      - NOME=servidor-py-2
+    volumes:
+      - ./python/servidor.py:/app/main.py
+      - ./dados:/app/dados
+    depends_on:
+      - broker
+      - proxy
+
+  servidor-js-1:
+    build:
+      context: ./javascript
+      dockerfile: Dockerfile
+    image: cc7261-projeto:javascript
+    container_name: servidor-js-1
+    environment:
+      - NOME=servidor-js-1
+    volumes:
+      - ./javascript/servidor.js:/app/main.js
+      - ./dados:/app/dados
+    depends_on:
+      - broker
+      - proxy
+
+  servidor-js-2:
+    build:
+      context: ./javascript
+      dockerfile: Dockerfile
+    image: cc7261-projeto:javascript
+    container_name: servidor-js-2
+    environment:
+      - NOME=servidor-js-2
+    volumes:
+      - ./javascript/servidor.js:/app/main.js
+      - ./dados:/app/dados
+    depends_on:
+      - broker
+      - proxy
+
+  # clientes (bots)
+
+  bot-py-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: bot-py-1
+    environment:
+      - NOME=bot-py-1
+    volumes:
+      - ./python/cliente.py:/app/main.py
+    depends_on:
+      - broker
+      - proxy
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+
+  bot-py-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261-projeto:python
+    container_name: bot-py-2
+    environment:
+      - NOME=bot-py-2
+    volumes:
+      - ./python/cliente.py:/app/main.py
+    depends_on:
+      - broker
+      - proxy
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+
+  bot-js-1:
+    build:
+      context: ./javascript
+      dockerfile: Dockerfile
+    image: cc7261-projeto:javascript
+    container_name: bot-js-1
+    environment:
+      - NOME=bot-js-1
+    volumes:
+      - ./javascript/cliente.js:/app/main.js
+    depends_on:
+      - broker
+      - proxy
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+
+  bot-js-2:
+    build:
+      context: ./javascript
+      dockerfile: Dockerfile
+    image: cc7261-projeto:javascript
+    container_name: bot-js-2
+    environment:
+      - NOME=bot-js-2
+    volumes:
+      - ./javascript/cliente.js:/app/main.js
+    depends_on:
+      - broker
+      - proxy
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
